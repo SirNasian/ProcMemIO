@@ -1,6 +1,10 @@
 #ifndef PROCMEMIO_H
 #define PROCMEMIO_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define PROCMEMIO_SUCCESS          0
 #define PROCMEMIO_ERROR_ATTACH     1
 #define PROCMEMIO_ERROR_DETACH     2
@@ -29,5 +33,10 @@ const PROCMEMIO_STATUS procmemio_write(const unsigned int pid, const void* addr,
 
 const PROCMEMIO_STATUS procmemio_readRegisters(const unsigned int pid, const void* addr, PROCMEMIO_REGS* regs);
 const PROCMEMIO_STATUS procmemio_writeRegisters(const unsigned int pid, const void* addr, PROCMEMIO_REGS* regs);
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
