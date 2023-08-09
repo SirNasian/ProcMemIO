@@ -21,7 +21,7 @@ const PROCMEMIO_STATUS procmemio_read(const unsigned int pid, const void* addr, 
 		errno = 0;
 		data = ptrace(PTRACE_PEEKDATA, pid, addr+offset, 0);
 		if ((data == -1) && (errno != 0))
-			return PROCMEMIO_ERROR_READ_ADDR;
+			return PROCMEMIO_ERROR_READ;
 
 		for (unsigned char i = 0; ((i < 8) && (offset+i < size)); i++)
 			p_buffer[offset+i] = p_data[i];
@@ -48,15 +48,14 @@ const PROCMEMIO_STATUS procmemio_write(const unsigned int pid, const void* addr,
 			errno = 0;
 			data = ptrace(PTRACE_PEEKDATA, pid, addr+offset, 0);
 			if ((data == -1) && (errno != 0))
-				return PROCMEMIO_ERROR_READ_ADDR;
+				return PROCMEMIO_ERROR_READ;
 		}
 
 		for (unsigned char i = 0; ((i < 8) && (offset+i < size)); i++)
 			p_data[i] = p_buffer[offset+i];
 
-		errno = 0;
-		if ((ptrace(PTRACE_POKEDATA, pid, addr+offset, data) == -1) && (errno != 0))
-			return PROCMEMIO_ERROR_WRITE_ADDR;
+		if (ptrace(PTRACE_POKEDATA, pid, addr+offset, data) == -1)
+			return PROCMEMIO_ERROR_WRITE;
 	}
 
 	return (ptrace(PTRACE_DETACH, pid, 0, 0) == -1) ? PROCMEMIO_ERROR_DETACH : PROCMEMIO_SUCCESS;
@@ -72,12 +71,12 @@ const PROCMEMIO_STATUS procmemio_readRegisters(const unsigned int pid, const voi
 
 	errno = 0;
 	data_original = ptrace(PTRACE_PEEKDATA, pid, addr, 0);
-	if ((data_original == -1) && (errno == -1)) return PROCMEMIO_ERROR_READ_ADDR;
+	if ((data_original == -1) && (errno == -1)) return PROCMEMIO_ERROR_READ;
 
 	data_breakpoint = data_original;
 	ptr = (unsigned char*)(&data_breakpoint);
 	ptr[0] = 0xCC;
-	if (ptrace(PTRACE_POKEDATA, pid, addr, data_breakpoint) == -1) return PROCMEMIO_ERROR_WRITE_ADDR;
+	if (ptrace(PTRACE_POKEDATA, pid, addr, data_breakpoint) == -1) return PROCMEMIO_ERROR_WRITE;
 
 	if (ptrace(PTRACE_CONT, pid, 0, 0) == -1) return PROCMEMIO_ERROR_CONTINUE;
 	waitpid(pid, (int*)(&data_breakpoint), 0);
@@ -94,7 +93,7 @@ const PROCMEMIO_STATUS procmemio_readRegisters(const unsigned int pid, const voi
 	(*regs).rdi = _regs.rdi;
 	(*regs).rip = --(_regs.rip);
 
-	if (ptrace(PTRACE_POKEDATA, pid, addr, data_original) == -1) return PROCMEMIO_ERROR_WRITE_ADDR;
+	if (ptrace(PTRACE_POKEDATA, pid, addr, data_original) == -1) return PROCMEMIO_ERROR_WRITE;
 	if (ptrace(PTRACE_SETREGS, pid, addr, &_regs) == -1) return PROCMEMIO_ERROR_WRITE_REG;
 	return (ptrace(PTRACE_DETACH, pid, 0, 0) == -1) ? PROCMEMIO_ERROR_DETACH : PROCMEMIO_SUCCESS;
 }
@@ -109,12 +108,12 @@ const PROCMEMIO_STATUS procmemio_writeRegisters(const unsigned int pid, const vo
 
 	errno = 0;
 	data_original = ptrace(PTRACE_PEEKDATA, pid, addr, 0);
-	if ((data_original == -1) && (errno == -1)) return PROCMEMIO_ERROR_READ_ADDR;
+	if ((data_original == -1) && (errno == -1)) return PROCMEMIO_ERROR_READ;
 
 	data_breakpoint = data_original;
 	ptr = (unsigned char*)(&data_breakpoint);
 	ptr[0] = 0xCC;
-	if (ptrace(PTRACE_POKEDATA, pid, addr, data_breakpoint) == -1) return PROCMEMIO_ERROR_WRITE_ADDR;
+	if (ptrace(PTRACE_POKEDATA, pid, addr, data_breakpoint) == -1) return PROCMEMIO_ERROR_WRITE;
 
 	if (ptrace(PTRACE_CONT, pid, 0, 0) == -1) return PROCMEMIO_ERROR_CONTINUE;
 	waitpid(pid, (int*)(&data_breakpoint), 0);
@@ -145,7 +144,7 @@ const PROCMEMIO_STATUS procmemio_writeRegisters(const unsigned int pid, const vo
 	_regs.rdi = regs.rdi;
 	_regs.rip = regs.rip;
 
-	if (ptrace(PTRACE_POKEDATA, pid, addr, data_original) == -1) return PROCMEMIO_ERROR_WRITE_ADDR;
+	if (ptrace(PTRACE_POKEDATA, pid, addr, data_original) == -1) return PROCMEMIO_ERROR_WRITE;
 	if (ptrace(PTRACE_SETREGS, pid, addr, &_regs) == -1) return PROCMEMIO_ERROR_WRITE_REG;
 	return (ptrace(PTRACE_DETACH, pid, 0, 0) == -1) ? PROCMEMIO_ERROR_DETACH : PROCMEMIO_SUCCESS;
 }
