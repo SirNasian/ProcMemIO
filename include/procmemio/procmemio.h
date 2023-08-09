@@ -12,6 +12,7 @@ extern "C" {
 #define PROCMEMIO_ERROR_WRITE_ADDR 4
 #define PROCMEMIO_ERROR_READ_REG   5
 #define PROCMEMIO_ERROR_WRITE_REG  6
+#define PROCMEMIO_ERROR_CONTINUE   7
 
 typedef unsigned char PROCMEMIO_STATUS;
 
@@ -28,11 +29,13 @@ typedef struct
 	unsigned long long int rip;
 } PROCMEMIO_REGS;
 
+typedef void (*WriteRegistersCallback)(PROCMEMIO_REGS* regs);
+
 const PROCMEMIO_STATUS procmemio_read(const unsigned int pid, const void* addr, const void* buffer, const unsigned int size);
 const PROCMEMIO_STATUS procmemio_write(const unsigned int pid, const void* addr, const void* buffer, const unsigned int size);
 
 const PROCMEMIO_STATUS procmemio_readRegisters(const unsigned int pid, const void* addr, PROCMEMIO_REGS* regs);
-const PROCMEMIO_STATUS procmemio_writeRegisters(const unsigned int pid, const void* addr, PROCMEMIO_REGS* regs);
+const PROCMEMIO_STATUS procmemio_writeRegisters(const unsigned int pid, const void* addr, WriteRegistersCallback writeRegisters);
 
 
 #ifdef __cplusplus
