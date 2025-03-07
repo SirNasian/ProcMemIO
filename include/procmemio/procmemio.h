@@ -5,6 +5,9 @@
 extern "C" {
 #endif
 
+#include <stddef.h>
+#include <stdint.h>
+
 #define PROCMEMIO_SUCCESS         0
 #define PROCMEMIO_ERROR_ATTACH    1
 #define PROCMEMIO_ERROR_DETACH    2
@@ -18,24 +21,24 @@ typedef unsigned char PROCMEMIO_STATUS;
 
 typedef struct
 {
-	unsigned long long int rax;
-	unsigned long long int rcx;
-	unsigned long long int rdx;
-	unsigned long long int rbx;
-	unsigned long long int rsp;
-	unsigned long long int rbp;
-	unsigned long long int rsi;
-	unsigned long long int rdi;
-	unsigned long long int rip;
+	uintptr_t rax;
+	uintptr_t rcx;
+	uintptr_t rdx;
+	uintptr_t rbx;
+	uintptr_t rsp;
+	uintptr_t rbp;
+	uintptr_t rsi;
+	uintptr_t rdi;
+	uintptr_t rip;
 } PROCMEMIO_REGS;
 
-typedef void (*WriteRegistersCallback)(PROCMEMIO_REGS* regs);
+typedef void (*WriteRegistersCallback)(PROCMEMIO_REGS *regs);
 
-const PROCMEMIO_STATUS procmemio_read(const unsigned int pid, const void* addr, const void* buffer, const unsigned int size);
-const PROCMEMIO_STATUS procmemio_write(const unsigned int pid, const void* addr, const void* buffer, const unsigned int size);
+const PROCMEMIO_STATUS procmemio_read(const unsigned int pid, const void *addr, const void *buffer, const size_t size);
+const PROCMEMIO_STATUS procmemio_write(const unsigned int pid, const void *addr, const void *buffer, const size_t size);
 
-const PROCMEMIO_STATUS procmemio_readRegisters(const unsigned int pid, const void* addr, PROCMEMIO_REGS* regs);
-const PROCMEMIO_STATUS procmemio_writeRegisters(const unsigned int pid, const void* addr, WriteRegistersCallback writeRegisters);
+const PROCMEMIO_STATUS procmemio_readRegisters(const unsigned int pid, const void *addr, PROCMEMIO_REGS *regs);
+const PROCMEMIO_STATUS procmemio_writeRegisters(const unsigned int pid, const void *addr, WriteRegistersCallback writeRegisters);
 
 
 #ifdef __cplusplus
