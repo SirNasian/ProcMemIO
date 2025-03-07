@@ -18,6 +18,7 @@ const PROCMEMIO_STATUS procmemio_read(const unsigned int pid, const void* addr, 
 	file = open(path, O_RDONLY);
 	lseek(file, (long)addr, SEEK_SET);
 	read(file, (void*)buffer, size);
+	close(file);
 	kill(pid, SIGCONT);
 
 	return PROCMEMIO_SUCCESS;
@@ -33,6 +34,7 @@ const PROCMEMIO_STATUS procmemio_write(const unsigned int pid, const void* addr,
 	file = open(path, O_WRONLY);
 	lseek(file, (long)addr, SEEK_SET);
 	write(file, (void*)buffer, size);
+	close(file);
 	kill(pid, SIGCONT);
 
 	return PROCMEMIO_SUCCESS;
